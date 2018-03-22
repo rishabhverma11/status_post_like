@@ -32,7 +32,7 @@ app.post('/user/login', user_panel.login);
 app.post('/user/statusupdate', user_panel.statusupdate);
 app.post('/user/get_post_list', user_panel.get_post_list);
 app.post('/user/like_list', user_panel.like_list);
-
+app.post('/user/status_comment', user_panel.status_comment);
 app.listen(port, function(){
 	console.log("Server is running on port "+port);
 });

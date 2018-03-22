@@ -7,49 +7,49 @@ var _ =require('lodash');
 var arr=[];
 // For signup
 exports.signup = function(req, res) {
-	var name = req.body.name;
-	var email = req.body.email;
-	var password = req.body.password;
-	
+    var name = req.body.name;
+    var email = req.body.email;
+    var password = req.body.password;
+    
 
-	var manValue = [name, email, countrycode, phonenum, password, confirmpass];
-	var checkBlank = comFunc.checkBlank(manValue);
+    var manValue = [name, email, countrycode, phonenum, password, confirmpass];
+    var checkBlank = comFunc.checkBlank(manValue);
 
-	if ( checkBlank == 1 ) {
-		responses.parameterMissing(res);
-	} else {
-		var sql = "SELECT * FROM `user` WHERE `email`=?";
-		connection.query(sql, [email], function(err, result){
-			if ( err ) {
-				responses.sendError(res);
-			} else {
-				if ( result.length > 0 ) {
-					responses.emailAlreadyExist(res);
-				} else {
-					var user_id = md5(new Date());
-					var access_token = md5(new Date());
+    if ( checkBlank == 1 ) {
+        responses.parameterMissing(res);
+    } else {
+        var sql = "SELECT * FROM `user` WHERE `email`=?";
+        connection.query(sql, [email], function(err, result){
+            if ( err ) {
+                responses.sendError(res);
+            } else {
+                if ( result.length > 0 ) {
+                    responses.emailAlreadyExist(res);
+                } else {
+                    var user_id = md5(new Date());
+                    var access_token = md5(new Date());
 
-					var insert_sql = "INSERT INTO `user`(`user_id`, `access_token`, `name`, `email`, `password`) VALUES(?,?,?,?,?)";
-					var values = [user_id, access_token, name, email, md5(password)];
-					connection.query(insert_sql, values, function(err, result){
-						if ( err ) {
-							responses.sendError(res);
-						} else {
-							var sql = "SELECT * FROM `user` WHERE `email`=?";
-							connection.query(sql, [email], function(err, result){
-								if ( err ) {
-									responses.sendError(res);
-								} else {
-									result[0].password = "";
-									responses.success(res, result[0]);
-								}
-							});
-						}
-					});
-				}
-			}
-		});
-	}
+                    var insert_sql = "INSERT INTO `user`(`user_id`, `access_token`, `name`, `email`, `password`) VALUES(?,?,?,?,?)";
+                    var values = [user_id, access_token, name, email, md5(password)];
+                    connection.query(insert_sql, values, function(err, result){
+                        if ( err ) {
+                            responses.sendError(res);
+                        } else {
+                            var sql = "SELECT * FROM `user` WHERE `email`=?";
+                            connection.query(sql, [email], function(err, result){
+                                if ( err ) {
+                                    responses.sendError(res);
+                                } else {
+                                    result[0].password = "";
+                                    responses.success(res, result[0]);
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
 }
 //for login
 exports.login = function(req, res) {
@@ -81,8 +81,8 @@ exports.login = function(req, res) {
                     } else if(result.length>0) {
                         responses.success(res, result[0]);
                     } else {
-                    	console.log("nodata");
-                    	responses.nodata(res);
+                        console.log("nodata");
+                        responses.nodata(res);
                     }
              
                   });
@@ -106,11 +106,11 @@ exports.statusupdate = function(req, res) {
 
         responses.parameterMissing(res);
     } else {
-    	// var sql = SELECT 'user_id' from `user` WHERE `access_token` = ?;
-    	// connection.query(sql, access_token function(err , result){
-    	// 	var user_id=result[0].user_id;
+        // var sql = SELECT 'user_id' from `user` WHERE `access_token` = ?;
+        // connection.query(sql, access_token function(err , result){
+        //  var user_id=result[0].user_id;
          //another way of finding userid
-    	// });
+        // });
         console.log('access');
         var date = new Date();
         var post_id = md5(new Date());
@@ -121,15 +121,15 @@ exports.statusupdate = function(req, res) {
                 console.log(err);
                 responses.sendError(res);
             } else {
-            	var sql = "SELECT * from `status_table` WHERE `post_id`=?"
-            	connection.query(sql, [post_id], function(err, result){
-            		if(err){
-            			responses.sendError(res);
-            		}else{
-            			console.log('success');
-                		responses.success(res, result);
-            		}
-            	});
+                var sql = "SELECT * from `status_table` WHERE `post_id`=?"
+                connection.query(sql, [post_id], function(err, result){
+                    if(err){
+                        responses.sendError(res);
+                    }else{
+                        console.log('success');
+                        responses.success(res, result);
+                    }
+                });
                
             }
         });
@@ -155,7 +155,7 @@ exports.get_post_list = function(req, res) {
                 var user_id = userresult[0].user_id;
                 console.log(user_id); 
                 if (userresult.length == 0) {
-                	responses.invalidaccesstoken(res);
+                    responses.invalidaccesstoken(res);
                 } else {
                     var post_sql = "SELECT * FROM `status_table` ORDER BY `row_id` DESC";
                     connection.query(post_sql, [], function(err, postList) {
@@ -163,7 +163,7 @@ exports.get_post_list = function(req, res) {
                             responses.sendError(res);
                         } else {
                             // when we want to merge different responses from  different - different table and to use as one we use async.eachSeries 
-                        	async.eachSeries(postList, processData, function(err) {
+                            async.eachSeries(postList, processData, function(err) {
                                 if (err) {
                                     responses.sendError(res);
                                 } else {
@@ -198,9 +198,47 @@ exports.get_post_list = function(req, res) {
         });
     }
 }
-exports.like_list = function(req, res) {
+exports.status_comment = function(req , res) {
+    var post_id = req.body.post_id;
+    var post = req.body.post;
+    console.log(post);
+    var access_token = req.body.access_token;
+    var manValue = [access_token];
+    var checkBlank = comFunc.checkBlank(manValue);
+    var date = (new Date());
+    var comment_id = md5(new Date());
 
-    
+    if (checkBlank == 1) {
+        responses.parameterMissing(res);
+    } else {
+        var sql = "SELECT `user_id` from `user` where access_token=?";
+        connection.query(sql , [access_token], function(err , result){
+            if(err){
+                responses.sendError(res);
+            } else {
+                var user_id = result[0].user_id;
+                var sql = "INSERT INTO `status_comment`(`comment_id`,`post_id`,`post_contant`, `comment_by`, `comment_on`) VALUES(?,?,?,?,?)"
+                var values = [comment_id,post_id,post,user_id,date];
+                connection.query(sql, values, function(err, result){
+                    if(err){
+                        responses.sendError(res);
+                    } else {
+                        var sql= "Select * from `status_comment` where post_id=?"
+                        connection.query(sql, [post_id], function(err, result){
+                            if(err){
+                                responses.sendError(res);
+                            } else {
+                                responses.success(res , result);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+}
+exports.like_list = function(req, res) {   
     var post_id = req.body.post_id;
     var access_token = req.body.access_token;
     var manValue = [access_token];
@@ -272,4 +310,3 @@ exports.like_list = function(req, res) {
         });
     }
 }
-

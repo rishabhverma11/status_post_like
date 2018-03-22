@@ -102,8 +102,9 @@
                              <div class="postListContentArea">\
                                 <h4>'+postListData[i]["post_contant"]+'</h4>\
                                 <div style="margin: 5px 0px;">\
+                                    <textarea class="form-control comment_area" rows="3" ></textarea>\
                                     <button class="btn btn-info post_like_button" style="margin-top: 5px;">like</button>\
-                                    <button class="btn btn-info post_button" style="margin-left: 5px;margin-top: 5px;">comment</button>\
+                                    <button class="btn btn-info post_comment_btm" style="margin-left: 5px;margin-top: 5px;">comment</button>\
                                 </div>\
                             </div>\
                         </div>');
@@ -131,7 +132,6 @@
                         "post": post,
                         "access_token": access_token,
                         "user_id": user_id
-
                     }
                 });
                 request.success(function(data) {
@@ -173,6 +173,24 @@
                 localStorage.removeItem("user");
                 window.location.replace('index.html');
             });
+            $(document).on('click', '.post_comment_btm', function(event){
+                event.preventDefault();
+                var post = $('.comment_area').val();
+                console.log(post);
+                var post_id = $(this).parents('.postList').attr("data-postID");
+                var access_token = localStorage.getItem("access_token");
+                console.log(access_token);
+                console.log('JS  running');
+                var request = $.ajax({
+                    "url" : "http://localhost:3003/user/status_comment",
+                    "type": "post",
+                    "data": {
+                        "post" : post,
+                        "post_id": post_id,
+                        "access_token": access_token
+                    }
+                });
+            });
             $(document).on('click', '.post_like_button', function(event){
                 event.preventDefault();
                 var post_id = $(this).parents('.postList').attr("data-postID");
@@ -188,7 +206,6 @@
                     }
                 });
             });
-
         
         });
     </script>
