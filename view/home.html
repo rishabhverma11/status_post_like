@@ -175,9 +175,10 @@
             });
             $(document).on('click', '.post_comment_btm', function(event){
                 event.preventDefault();
-                var post = $('.comment_area').val();
-                console.log(post);
+
                 var post_id = $(this).parents('.postList').attr("data-postID");
+                var post = $(this).parents('.postListContentArea').find('.comment_area').val();
+                console.log(post);
                 var access_token = localStorage.getItem("access_token");
                 console.log(access_token);
                 console.log('JS  running');
